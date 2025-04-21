@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 
     public InputPlayModule InputModule;
     public CharacterController Body;
+    public Animator Anim;
     public float Speed;
 
     //Ts instantiate Singleton
@@ -60,13 +61,19 @@ public class PlayerController : MonoBehaviour
         if (IsIdle)
         {
             // Character idles.
+            Anim.SetFloat("Move", 0f);
             Idle();
         }
         // If there's input,
         else
         {
-            // Character move.
+            // Character Animation
             Run();
+            Anim.SetFloat("Move", 1f);
+            var rotate = Quaternion.LookRotation(vector);
+            transform.rotation = Quaternion.Slerp(rotate, transform.rotation, Time.deltaTime);
+
+            // Character Move
             Body.Move(vector * Speed * Time.deltaTime);
         }
         // Character ded.
@@ -82,6 +89,7 @@ public class PlayerController : MonoBehaviour
         // Singleton(Lazy) > Hanya mengizinkan object untuk exist cuma satu kali (ex: Player. Multiplayer? That's a guest!)
         Instance = this;
         Body = GetComponent<CharacterController>();
+        Anim = GetComponent<Animator>();
     }
 
     private void Update()
