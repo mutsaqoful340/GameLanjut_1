@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
 
     public InputPlayModule InputModule;
     public CharacterController Body;
+    public float Speed;
 
     //Ts instantiate Singleton
     public static PlayerController Instance { get; private set; }
@@ -47,14 +48,14 @@ public class PlayerController : MonoBehaviour
     }
     private void Locomotion()
     {
-        // Posisi awal adalah Fall
+        // Default position is Fall
         Fall();
         // ?"Normalized" is used for things doesn't need acceleration.
         // ?Value of "Normalized" is 1. And the kind that bettween 0-1 is called "Fuzzy". It's used for things need acceleration.
 
         // Waiting input
         var vector = InputModule ? InputModule.MoveHandler.normalized : Vector3.zero;
-        var IsIdle = (vector.x, vector.y) == (0, 0);
+        var IsIdle = (vector.x, vector.z) == (0, 0);
         // If there's no input,
         if (IsIdle)
         {
@@ -66,6 +67,7 @@ public class PlayerController : MonoBehaviour
         {
             // Character move.
             Run();
+            Body.Move(vector * Speed * Time.deltaTime);
         }
         // Character ded.
         Death();

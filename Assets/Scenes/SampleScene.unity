@@ -294,6 +294,7 @@ GameObject:
   m_Component:
   - component: {fileID: 904280802}
   - component: {fileID: 904280801}
+  - component: {fileID: 904280803}
   m_Layer: 0
   m_Name: Ground
   m_TagString: Untagged
@@ -355,6 +356,26 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!154 &904280803
+TerrainCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 904280799}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_TerrainData: {fileID: 15600000, guid: b1df79ed88472e041841980b42887856, type: 2}
+  m_EnableTreeColliders: 1
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -440,13 +461,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.9939381, z: -0, w: 0.10994117}
-  m_LocalPosition: {x: 4.07, y: 1.6, z: 3.4}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.07, y: 3.28, z: -3.84}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: -167.376, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1580587037 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: dddeaeb497188f24988e2074eeeb64b6, type: 3}
@@ -720,7 +741,7 @@ Transform:
   m_GameObject: {fileID: 919132148194678783}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.8759685, y: 0.0000034570694, z: 2.9695218}
+  m_LocalPosition: {x: 3.8759685, y: 1.82, z: 2.9695218}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2182,7 +2203,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 87e669e7430eb994fba31022e61516af, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_WarningMessage: 
@@ -2203,6 +2224,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InputModule: {fileID: 11400000, guid: 660eec0158c1fd44d8a2d9a3769f626f, type: 2}
+  Body: {fileID: 0}
+  Speed: 5
 --- !u!143 &5866666020722480961
 CharacterController:
   m_ObjectHideFlags: 0
