@@ -4,17 +4,11 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "InputPlayModule", menuName = "AddOn/Gameplay", order = 0)]
 public class InputPlayModule : ScriptableObject
 {
+    public bool JumpInput => Input.GetButtonDown("Jump"); // Replace with your actual input check logic
+    public Vector3 MoveHandler => new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+
     public Action<ActionState> OnAction { get; set; }
 
-    public Vector3 MoveHandler
-    {
-        get
-        {
-            var axisX = input.GamePlay.Movement.ReadValue<Vector2>().x;
-            var axisZ = input.GamePlay.Movement.ReadValue<Vector2>().y;
-            return new Vector3(axisX, 0, axisZ);
-        }
-    }
 
     //public bool RightHoldHandler => input.GamePlay.CamRight.ReadValue<float>() > 0;
     //public bool LeftHoldHandler => input.GamePlay.CamLeft.ReadValue<float>() > 0;

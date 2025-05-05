@@ -1,176 +1,184 @@
-
 using System.Collections;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-
     public InputPlayModule InputModule;
     public CharacterController Body;
     public Animator Anim;
-    public Vector3 MoveUpdate;
-    public float Speed;
+    public float Speed = 5f;
+    public float gravity = -20f;
+    public float jumpHeight = 1f;
+    public Transform CameraTransform;
+    public float lookSpeedX = 2f;  // Mouse sensitivity for X axis
+    public float lookSpeedY = 2f;  // Mouse sensitivity for Y axis
 
+    private float verticalVelocity;
+    private Vector3 moveDirection;
+    private float rotationX = 0f;
 
-    // State Locomotion
+    // State
     public bool IsIdle;
     public bool IsFall;
     public bool IsJump;
 
-
-    //Ts instantiate Singleton
+    // Singleton
     public static PlayerController Instance { get; private set; }
 
     private IEnumerator JumpCoroutine()
     {
-        if (!IsJump)
+        if (!IsJump && Body.isGrounded)
         {
-            // Matikan efek gravitasi
-            IsFall = false;
             IsJump = true;
-
-            if (!IsIdle)
-            {
-                //Tinggikan nilai axis y
-                MoveUpdate.y++;
-                // Gerakkan karakter
-                Body.Move(MoveUpdate * Time.deltaTime);
-                yield return new WaitForSeconds(0.3f);
-
-            }
-            else
-            {
-                // Untuk loncat diam
-                MoveUpdate.y += 9.8f;
-                Body.Move(MoveUpdate * Time.deltaTime);
-                yield return new WaitForSeconds(0.3f);
-            }
-            // Aktifkan efek gravitasi;
-            IsFall = true;  
+            verticalVelocity = Mathf.Sqrt(jumpHeight * -1 * gravity); // Physics-based jump velocity
+            yield return null;
         }
     }
-    
+
     private void Action(ActionState state)
     {
-        switch(state)
+        switch (state)
         {
             case ActionState.Skill:
                 StartCoroutine(JumpCoroutine());
                 break;
         }
     }
-    private void Fall()
-    {
-        if (IsFall)
-        {
-            MoveUpdate.y += -9.8f * Time.deltaTime;
 
-            //Gerakkan karakter agar jatoh ke bawah
-            Body.Move(MoveUpdate * Time.deltaTime);
-            if (Body.isGrounded)
+    private void HandleGravityAndJump()
+    {
+        if (Body.isGrounded)
+        {
+            if (verticalVelocity < 0f)
             {
-                // Reset pergerakan ke nilai 0
-                MoveUpdate = Vector3.zero;
+                verticalVelocity = -2f; // Stick to ground
+            }
+
+            IsFall = false;
+
+            // Apply jump force when grounded (whether moving or idle)
+            if (IsJump)
+            {
+                verticalVelocity = Mathf.Sqrt(jumpHeight * -1f * gravity); // Physics-based jump velocity
                 IsJump = false;
             }
-            else
-            {
-                IsJump = true;
-            }
         }
-    }
-
-    private void Idle()
-    {
-
-    }
-
-    private void Run()
-    {
-
-    }
-
-    private void Death()
-    {
-
-    }
-
-    private void Jump()
-    {
-
-    }
-
-    private void Dash()
-    {
-
-    }
-
-    private void Walk()
-    {
-
-    }
-    private void Locomotion()
-    {
-        // Default position is Fall
-        Fall();
-        // ?"Normalized" is used for things doesn't need acceleration.
-        // ?Value of "Normalized" is 1. And the kind that bettween 0-1 is called "Fuzzy". It's used for things need acceleration.
-
-        // Waiting input
-        var vector = InputModule ? InputModule.MoveHandler.normalized : Vector3.zero;
-        IsIdle = (vector.x, vector.z) == (0, 0);
-        
-        if (IsIdle)
-        {
-            // Character idles.
-            Anim.SetFloat("Move", 0f);
-            Idle();
-        }
-        // If there's input,
         else
         {
-            // Character Animation
-            Run();
-            Anim.SetFloat("Move", 1f);
-
-            if (!IsJump)
-            {
-                // Update movement
-                MoveUpdate = new Vector3(vector.x, MoveUpdate.y, vector.z);
-                var rotate = Quaternion.LookRotation(vector);
-
-                // Character Rotation
-                transform.rotation = Quaternion.Slerp(rotate, transform.rotation, Time.deltaTime);
-            }
-
-            // Character Move
-            Body.Move(Speed * Time.deltaTime * MoveUpdate);
+            verticalVelocity += gravity * Time.deltaTime;
+            IsFall = true;
         }
-        // Character ded.
-        Death();
 
-        Jump();
-        Walk();
-        Dash();
+        moveDirection.y = verticalVelocity;
     }
 
-    private void Start()
+    private void Locomotion()
     {
-        // Singleton(Lazy) > Hanya mengizinkan object untuk exist cuma satu kali (ex: Player. Multiplayer? That's a guest!)
-        Instance = this;
-        // Initialize component
-        Body = GetComponent<CharacterController>();
-        Anim = GetComponent<Animator>();
+        HandleGravityAndJump();
 
-        // Initilize Action
-        InputModule.OnAction = Action;
+        Vector3 input = InputModule ? InputModule.MoveHandler.normalized : Vector3.zero;
+        IsIdle = input == Vector3.zero;
+
+        if (IsIdle)
+        {
+            Anim.SetFloat("Move", 0f);  // Correctly set idle animation
+        }
+        else
+        {
+            Anim.SetFloat("Move", 1f);  // Set movement animation
+        }
+
+        // Get camera-relative movement direction
+        Vector3 camForward = Vector3.Scale(CameraTransform.forward, new Vector3(1, 0, 1)).normalized;
+        Vector3 camRight = CameraTransform.right;
+        Vector3 desiredDirection = camForward * input.z + camRight * input.x;
+        desiredDirection.Normalize();
+
+        // Rotate player to face movement direction
+        if (desiredDirection != Vector3.zero)
+        {
+            Quaternion toRotation = Quaternion.LookRotation(desiredDirection, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, Time.deltaTime * 10f);
+        }
+
+        moveDirection = desiredDirection * Speed;
+        moveDirection.y = verticalVelocity;
+
+        // Animate & move
+        Body.Move(moveDirection * Time.deltaTime);
     }
 
     private void Update()
     {
         Locomotion();
+
+        // Mouse look adjustments for camera rotation
+        float mouseX = Input.GetAxis("Mouse X") * lookSpeedX;
+        float mouseY = Input.GetAxis("Mouse Y") * lookSpeedY;
+
+        // Invert mouse Y if necessary (fixes the inverted vertical mouse movement)
+        rotationX -= mouseY;
+        rotationX = Mathf.Clamp(rotationX, -90f, 90f);  // Clamp the vertical rotation to avoid flipping
+
+        // Rotate camera around the X axis (up/down)
+        CameraTransform.localRotation = Quaternion.Euler(rotationX, 0f, 0f);
+
+        // Invert the mouse X axis (fixes the inverted horizontal mouse movement)
+        mouseX = -mouseX;  // Flip the horizontal input
+
+        // Rotate player around the Y axis (left/right)
+        transform.Rotate(Vector3.up * mouseX);
+
+        // Check for jump input (replace 'JumpInput' with actual input from your InputPlayModule)
+        if (InputModule != null && InputModule.JumpInput)  // Replace with your actual jump input logic
+        {
+            if (!IsJump && Body.isGrounded)  // Allow jump if grounded and not already jumping
+            {
+                StartCoroutine(JumpCoroutine());
+            }
+        }
+
+        // Toggle mouse lock (you can replace "Escape" with any key you prefer)
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            ToggleMouseLock();
+        }
+    }
+
+
+    private void ToggleMouseLock()
+    {
+        // Toggle mouse lock state
+        if (Cursor.lockState == CursorLockMode.Locked)
+        {
+            Cursor.lockState = CursorLockMode.None;  // Unlock the mouse
+            Cursor.visible = true;  // Make cursor visible
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;  // Lock the mouse
+            Cursor.visible = false;  // Hide cursor
+        }
+    }
+
+    private void Start()
+    {
+        Instance = this;
+        Body = GetComponent<CharacterController>();
+        Anim = GetComponent<Animator>();
+
+        if (CameraTransform == null)
+        {
+            CameraTransform = Camera.main.transform;
+        }
+
+        if (InputModule != null)
+        {
+            InputModule.OnAction = Action;
+        }
+
+        // Lock the cursor at the start
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 }
