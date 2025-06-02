@@ -21,20 +21,21 @@ public class ItemActive : MonoBehaviour
 
     }
 
-    private void OnTriggerEnter(Collider gameObject)
+    private void OnTriggerEnter(Collider ColliderGuwe)
     {
-        if (gameObject.CompareTag("BLU"))
+        if (ColliderGuwe.CompareTag("BLU"))
         {
-
+            Destroy(ColliderGuwe.gameObject);
             Durasi += 5f;
         }
 
-        else if (gameObject.CompareTag("RED"))
+        else if (ColliderGuwe.CompareTag("RED"))
         {
+            Destroy(ColliderGuwe.gameObject);
             Durasi -= 2f;
         }
 
-        else if (gameObject.CompareTag("GRN"))
+        else if (ColliderGuwe.CompareTag("GRN"))
         {
             Time.timeScale = 0f; //Freezes game
             Destroy(gameObject);
