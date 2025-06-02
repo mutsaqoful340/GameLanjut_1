@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    public float Durasi = 30f;
+
     public InputPlayModule InputModule;
     public CharacterController Body;
     public Animator Anim;

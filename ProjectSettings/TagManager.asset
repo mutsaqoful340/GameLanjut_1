@@ -5,6 +5,10 @@ TagManager:
   serializedVersion: 2
   tags:
   - Terrain
+  - BLU
+  - RED
+  - GRN
+  - Canvas_GameOver
   layers:
   - Default
   - TransparentFX
