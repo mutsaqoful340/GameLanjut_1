@@ -87,5 +87,10 @@ public class EnemyActive : MonoBehaviour
 
         // Fungsi Death
 
+        if (CurrHealth == 0)
+        {
+            enemyAnimator.SetBool("Death", true);
+            State = EnemyState.Death;
+        }
     }
 }
