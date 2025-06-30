@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class ItemActive : MonoBehaviour
 {
-    public float Durasi = 30f;
 
     private int Score = 0;
     public TextMeshProUGUI scoreText;
@@ -18,10 +17,7 @@ public class ItemActive : MonoBehaviour
 
     public Animator Anim;
     public GameObject GameOverPanel;
-     private void IsDeath()
-    {
-
-    }
+    public GameObject WinPanel;
 
     private void Start()
     {
@@ -45,7 +41,7 @@ public class ItemActive : MonoBehaviour
         {
             // Handle Green item (e.g., game over)
             Time.timeScale = 0f; // Freezes game
-            Destroy(gameObject);
+            WinPanel.SetActive(true);
         }
 
         else if (ColliderGuwe.CompareTag("Tongkat"))
