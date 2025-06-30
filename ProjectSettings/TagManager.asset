@@ -9,6 +9,7 @@ TagManager:
   - RED
   - GRN
   - Canvas_GameOver
+  - Enemy
   layers:
   - Default
   - TransparentFX

@@ -50,7 +50,7 @@ public class EnemyActive : MonoBehaviour
         }
 
         Distance = Vector3.Distance(enemyTargetting.position, transform.position);
-        if (Distance < 15f)
+        if (Distance < 100f)
         {
             
             var lookPos = (enemyTargetting.position - transform.position);
