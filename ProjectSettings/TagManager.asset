@@ -10,6 +10,7 @@ TagManager:
   - GRN
   - Canvas_GameOver
   - Enemy
+  - Tongkat
   layers:
   - Default
   - TransparentFX
